@@ -10,10 +10,14 @@ for path in glob.glob('*.csv'): #searches directory for *csv files
     cleaned_path = path.strip('.csv')  # cleans file path of .csv
 #     print(cleaned_path) #test
     stockmarket.append(cleaned_path) # appends stock names to a list
-    csvtodf = pd.read_csv(path) # reads each csv and passes to a dataframe
     stock_dict[cleaned_path] = pd.read_csv(path)
+
     #     print(csvtodf) #test
-print(stock_dict.keys())
+print(stock_dict)
+
+
+
+
 
 
 
