@@ -5,15 +5,19 @@ import glob as glob
 # create empty structures
 stockmarket = [] #empty list to be filled with stock tickers
 stock_dict ={}   #empty dict to be filled with stock tickers and dataframe data.
+universe = pd.DataFrame()
+
 
 for path in glob.glob('*.csv'): #searches directory for *csv files
-    cleaned_path = path.strip('.csv')  # cleans file path of .csv
-#     print(cleaned_path) #test
-    stockmarket.append(cleaned_path) # appends stock names to a list
-    stock_dict[cleaned_path] = pd.read_csv(path)
+    stick_ticker = path.strip('.csv')  # cleans file path of .csv
+    stockmarket.append(stick_ticker) # appends stock names to a list
+    stock_dict[stick_ticker] = pd.read_csv(path, usecols=['Close','Adj Close']) #assigns stock ticker to dictionary key
+    universe = pd.concat(stock_dict,axis=1)
 
-    #     print(csvtodf) #test
-print(stock_dict)
+
+# print(stock_dict.keys())
+# print(stock_dict['AAPL'])
+# print(universe)
 
 
 
