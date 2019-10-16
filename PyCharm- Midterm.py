@@ -12,8 +12,8 @@ import re
 # create empty structures
 stockmarket = []  # empty list to be filled with stock tickers
 stock_dict = {}  # empty dict to be filled with stock tickers and dataframe data.
-universe = pd.DataFrame()
-df= pd.DataFrame()
+
+
 
 
 # opening paths and creating dictionaries and dataframes
@@ -22,10 +22,14 @@ for path in glob.glob('*.csv'): #searches directory for *csv files
     stock_ticker = path.strip('.csv')  # cleans file path of .csv
     stockmarket.append(stock_ticker) # appends stock names to a list
     stock_dict[stock_ticker] = pd.read_csv(path, usecols=['Date','Close','Adj Close'],index_col='Date') #assigns stock ticker to dictionary key
-    stock_dict[stock_ticker].insert(2,'Ratio',0)
+    stock_dict[stock_ticker].insert(2, 'Close Ratio', stock_dict[stock_ticker]['Close'].shift(-1)/stock_dict[stock_ticker]['Close'])
+    stock_dict[stock_ticker].insert(3, 'Adj Close Ratio', stock_dict[stock_ticker]['Adj Close'].shift(-1) / stock_dict[stock_ticker]['Adj Close'])
     universe = pd.concat(stock_dict,axis=1)   # concatenated axis for each stock ticker to a single dataframe
+
 print(universe)
-# print(stock_dict['AAPL'])
+# print(stock_dict['AAPL']['Close'].shift(-1)/stock_dict['AAPL']['Close'])
+# aapl_closeratio = stock_dict[stock_ticker]['Close'].shift(-1)/stock_dict[stock_ticker]['Close']
+# print(stock_dict['AAPL']['Ratio'])
 
 
 
