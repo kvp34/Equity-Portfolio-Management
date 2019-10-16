@@ -25,7 +25,7 @@ for path in glob.glob('*.csv'): #searches directory for *csv files
     stock_dict[stock_ticker].insert(2,'Ratio',0)
     universe = pd.concat(stock_dict,axis=1)   # concatenated axis for each stock ticker to a single dataframe
 print(universe)
-print(stock_dict['AAPL'])
+# print(stock_dict['AAPL'])
 
 
 
