@@ -18,6 +18,10 @@ stockmarket = []  # empty list to be filled with stock tickers
 stock_dict = {}  # empty dict to be filled with stock tickers and dataframe data.
 div_days_dict = {}
 stock_shares = {}
+cash_left = {}
+cash_list = []
+
+
 # rebalancing strategy
 # re_allocation_day = 5
 # stock_dict[stock_ticker]['Adj Close'].shift(+re_allocation_day) / stock_dict[stock_ticker]['Adj Close']
@@ -40,8 +44,14 @@ for i in range(0,len(portfolio)):
     ticker = portfolio[i]
     # print(stock_dict[ticker]['Close'].iloc[0])
     stock_shares[ticker + ' Shares'] = int(initial_investment/stock_dict[ticker]['Close'].iloc[0])
+    cash_left[ticker] = initial_investment - (stock_shares[ticker + ' Shares']*stock_dict[ticker]['Close'].iloc[0])
+    cash_list.append(cash_left[ticker])
 print(stock_shares)
-
+print(cash_left)
+print(cash_left['IBM'])
+print(type(cash_left['IBM']))
+print(cash_list)
+print(sum(cash_list))
 
 
 # print(universe.iloc[5]/universe.iloc[0])
