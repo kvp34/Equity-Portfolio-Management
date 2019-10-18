@@ -20,16 +20,23 @@ stock_dict = {}  # empty dict to be filled with stock tickers and dataframe data
 
 for path in glob.glob('*.csv'): #searches directory for *csv files
     stock_ticker = path.strip('.csv')  # cleans file path of .csv
+    # print(stock_ticker)
     stockmarket.append(stock_ticker) # appends stock names to a list
     stock_dict[stock_ticker] = pd.read_csv(path, usecols=['Date','Close','Adj Close'],index_col='Date') #assigns stock ticker to dictionary key
-    stock_dict[stock_ticker].insert(2, 'Close Ratio', stock_dict[stock_ticker]['Close'].shift(-1)/stock_dict[stock_ticker]['Close'])
-    stock_dict[stock_ticker].insert(3, 'Adj Close Ratio', stock_dict[stock_ticker]['Adj Close'].shift(-1) / stock_dict[stock_ticker]['Adj Close'])
+    stock_dict[stock_ticker].insert(2, 'Close Ratio', stock_dict[stock_ticker]['Close'].shift(+1)/stock_dict[stock_ticker]['Close'])
+    stock_dict[stock_ticker].insert(3, 'Adj Close Ratio', stock_dict[stock_ticker]['Adj Close'].shift(+1) / stock_dict[stock_ticker]['Adj Close'])
+    stock_dict[stock_ticker].insert(4, stock_ticker + ' Dividend', abs(round((stock_dict[stock_ticker]['Adj Close Ratio'] - stock_dict[stock_ticker]['Close Ratio']),5)))
     universe = pd.concat(stock_dict,axis=1)   # concatenated axis for each stock ticker to a single dataframe
 
-print(universe)
-# print(stock_dict['AAPL']['Close'].shift(-1)/stock_dict['AAPL']['Close'])
-# aapl_closeratio = stock_dict[stock_ticker]['Close'].shift(-1)/stock_dict[stock_ticker]['Close']
-# print(stock_dict['AAPL']['Ratio'])
+
+
+# print(universe)
+
+# print(universe['TSLA']['TSLA Dividend'].loc[universe['TSLA']['TSLA Dividend']>0]) # Cannot index with multidimensional key
+# print(stock_dict['AAPL']['AAPL Dividend'].loc[stock_dict['AAPL']['AAPL Dividend'] > 0]) # returns values from specific dictonary
+
+print(stock_dict['TSLA']['TSLA Dividend'].loc[stock_dict['TSLA']['TSLA Dividend'] > 0]) # returns values from specific dictonary
+print(stock_dict['TSLA']['TSLA Dividend'].loc[stock_dict['TSLA']]) #https://github.com/pandas-dev/pandas/issues/7981 , ValueError: Cannot index with multidimensional key
 
 
 
