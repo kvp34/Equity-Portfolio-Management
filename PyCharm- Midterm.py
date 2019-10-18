@@ -8,13 +8,22 @@ import re
 
 
 
+#Variables
+cash = 5000000
+initial_investment = cash / 5
+portfolio = ['IBM', 'MSFT', 'GOOG', 'AAPL', 'AMZN']
 
 # create empty structures
 stockmarket = []  # empty list to be filled with stock tickers
 stock_dict = {}  # empty dict to be filled with stock tickers and dataframe data.
 div_days_dict = {}
-# opening paths and creating dictionaries and dataframes
+stock_shares = {}
+# rebalancing strategy
+# re_allocation_day = 5
+# stock_dict[stock_ticker]['Adj Close'].shift(+re_allocation_day) / stock_dict[stock_ticker]['Adj Close']
 
+
+# opening paths and creating dictionaries and dataframes
 for path in glob.glob('*.csv'): #searches directory for *csv files
     stock_ticker = path.strip('.csv')  # cleans file path of .csv
     stockmarket.append(stock_ticker) # appends stock names to a list
@@ -26,6 +35,22 @@ for path in glob.glob('*.csv'): #searches directory for *csv files
     div_ser = stock_dict[stock_ticker][stock_ticker + ' Dividend'].loc[stock_dict[stock_ticker][stock_ticker + ' Dividend'] > 0]
     div_days_dict[stock_ticker] = div_ser
 
+
+for i in range(0,len(portfolio)):
+    ticker = portfolio[i]
+    # print(stock_dict[ticker]['Close'].iloc[0])
+    stock_shares[ticker + ' Shares'] = int(initial_investment/stock_dict[ticker]['Close'].iloc[0])
+print(stock_shares)
+
+
+
+# print(universe.iloc[5]/universe.iloc[0])
+# print(type(universe.iloc[5]))
+# print(universe.filter(regex='Dividend',axis=1))
+# print(universe.filter(regex='Dividend',axis=1).iloc[5])
+# print(type(universe.filter(regex='Dividend',axis=1).iloc[5]))
+# print(list(universe.filter(regex='Dividend',axis=1).iloc[5]))  #https://stackoverflow.com/questions/19482970/get-list-from-pandas-dataframe-column-headers
+# print(universe.get_level_values())
 
 
 
