@@ -6,8 +6,6 @@ from math import sqrt
 import glob                                                     # glob is a module that files all pathnames matching a specified pattern
 import re
 
-
-
 #Variables
 cash = 5000000
 initial_investment = cash / 5
@@ -19,7 +17,11 @@ stock_dict = {}  # empty dict to be filled with stock tickers and dataframe data
 div_days_dict = {}
 stock_shares_dict = {}
 cash_left = {}
+
 cash_list = []
+shares_list = []
+close_price_list = []
+# cash_arr = np.array()
 
 
 # rebalancing strategy
@@ -42,24 +44,62 @@ for path in glob.glob('*.csv'): #searches directory for *csv files
 
 for i in range(0,len(portfolio)):
     ticker = portfolio[i]
-    # print(stock_dict[ticker]['Close'].iloc[0])
     close_price = stock_dict[ticker]['Close'].iloc[0]
     stock_shares_dict[ticker + ' Shares'] = float(int(initial_investment/close_price))
-    stock_shares = stock_shares_dict
     cash_left[ticker] = initial_investment - (stock_shares_dict[ticker + ' Shares'] * close_price)
+
     cash_list.append(cash_left[ticker])
+    shares_list.append(stock_shares_dict[ticker + ' Shares'])
+    close_price_list.append(close_price)
 
-print(close_price)
-print(type(close_price)) #float
-
-print(stock_shares_dict[ticker + ' Shares'])
-print(type(stock_shares_dict[ticker + ' Shares'])) #int
-
-print(cash_left[ticker])
-print(type(cash_left[ticker])) #float
-
-MTM = cash_left[ticker] + (stock_shares_dict[ticker + ' Shares'] * close_price)
+    cash_arr = np.asarray(cash_list)
+    shares_arr = np.asarray(shares_list)
+    close_price_arr = np.asarray(close_price_list)
+    MTM = sum(cash_arr) + sum(shares_arr * close_price_arr)
 print(MTM)
+
+
+# # Cash
+# # print(cash_list)
+# # print(type(cash_list))
+#
+# cash_arr = np.asarray(cash_list)
+# # print(cash_arr)
+# #
+# # # Shares
+# # print(shares_list)
+# # print(type(shares_list))
+#
+# shares_arr = np.asarray(shares_list)
+# # print(shares_arr)
+# # print(type(shares_arr))
+#
+# # Close Price
+# # print(close_price_list)
+# # print(type(close_price_list))
+#
+# close_price_arr = np.asarray(close_price_list)
+# # print(close_price_arr)
+# # print(type(close_price_arr))
+#
+# MTM = sum(cash_arr) + sum(shares_arr * close_price_arr)
+# print(MTM)
+
+#____________________________________MTM Equation_________________________________________________________________
+# MTM = cash_left[ticker] + (stock_shares_dict[ticker + ' Shares'] * close_price)
+# print(MTM)
+#____________________________________MTM Equation_________________________________________________________________
+#
+# print(close_price)
+# print(type(close_price)) #float
+#
+# print(stock_shares_dict[ticker + ' Shares'])
+# print(type(stock_shares_dict[ticker + ' Shares'])) #int
+#
+# print(cash_left[ticker])
+# print(type(cash_left[ticker])) #float
+
+
 
 
 
