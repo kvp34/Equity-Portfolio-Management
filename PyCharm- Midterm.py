@@ -17,7 +17,7 @@ portfolio = ['IBM', 'MSFT', 'GOOG', 'AAPL', 'AMZN']
 stockmarket = []  # empty list to be filled with stock tickers
 stock_dict = {}  # empty dict to be filled with stock tickers and dataframe data.
 div_days_dict = {}
-stock_shares = {}
+stock_shares_dict = {}
 cash_left = {}
 cash_list = []
 
@@ -30,7 +30,7 @@ cash_list = []
 # opening paths and creating dictionaries and dataframes
 for path in glob.glob('*.csv'): #searches directory for *csv files
     stock_ticker = path.strip('.csv')  # cleans file path of .csv
-    stockmarket.append(stock_ticker) # appends stock names to a list
+    # stockmarket.append(stock_ticker) # delete
     stock_dict[stock_ticker] = pd.read_csv(path, usecols=['Date','Close','Adj Close'],index_col='Date') #assigns stock ticker to dictionary key
     stock_dict[stock_ticker].insert(2, 'Close Ratio', stock_dict[stock_ticker]['Close'].shift(+1)/stock_dict[stock_ticker]['Close'])
     stock_dict[stock_ticker].insert(3, 'Adj Close Ratio', stock_dict[stock_ticker]['Adj Close'].shift(+1) / stock_dict[stock_ticker]['Adj Close'])
@@ -38,20 +38,29 @@ for path in glob.glob('*.csv'): #searches directory for *csv files
     universe = pd.concat(stock_dict,axis=1)   # concatenated axis for each stock ticker to a single dataframe
     div_ser = stock_dict[stock_ticker][stock_ticker + ' Dividend'].loc[stock_dict[stock_ticker][stock_ticker + ' Dividend'] > 0]
     div_days_dict[stock_ticker] = div_ser
-
+# print(universe.to_string())
 
 for i in range(0,len(portfolio)):
     ticker = portfolio[i]
     # print(stock_dict[ticker]['Close'].iloc[0])
-    stock_shares[ticker + ' Shares'] = int(initial_investment/stock_dict[ticker]['Close'].iloc[0])
-    cash_left[ticker] = initial_investment - (stock_shares[ticker + ' Shares']*stock_dict[ticker]['Close'].iloc[0])
+    close_price = stock_dict[ticker]['Close'].iloc[0]
+    stock_shares_dict[ticker + ' Shares'] = float(int(initial_investment/close_price))
+    stock_shares = stock_shares_dict
+    cash_left[ticker] = initial_investment - (stock_shares_dict[ticker + ' Shares'] * close_price)
     cash_list.append(cash_left[ticker])
-print(stock_shares)
-print(cash_left)
-print(cash_left['IBM'])
-print(type(cash_left['IBM']))
-print(cash_list)
-print(sum(cash_list))
+
+print(close_price)
+print(type(close_price)) #float
+
+print(stock_shares_dict[ticker + ' Shares'])
+print(type(stock_shares_dict[ticker + ' Shares'])) #int
+
+print(cash_left[ticker])
+print(type(cash_left[ticker])) #float
+
+MTM = cash_left[ticker] + (stock_shares_dict[ticker + ' Shares'] * close_price)
+print(MTM)
+
 
 
 # print(universe.iloc[5]/universe.iloc[0])
