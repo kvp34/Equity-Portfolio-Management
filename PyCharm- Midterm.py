@@ -1,49 +1,93 @@
 import numpy as np
-import glob as glob
 import pandas as pd
+import glob
 import os.path
 from math import sqrt
-import glob                                                     # glob is a module that files all pathnames matching a specified pattern
 import re
 
 #Variables
 cash = 5000000
 initial_investment = cash / 5
 portfolio = ['IBM', 'MSFT', 'GOOG', 'AAPL', 'AMZN']
-
-# create empty structures
-stockmarket = []  # empty list to be filled with stock tickers
-stock_dict = {}  # empty dict to be filled with stock tickers and dataframe data.
+rebal_inverval = 5
+# Dictonaries
+stock_dict = {}
 div_days_dict = {}
 stock_shares_dict = {}
 cash_left = {}
-
+adj_close_percent_change = {}
+# Lists
+stockmarket = []
 cash_list = []
 shares_list = []
 close_price_list = []
-# cash_arr = np.array()
+# check_max = []
 
 
-# rebalancing strategy
-# re_allocation_day = 5
-# stock_dict[stock_ticker]['Adj Close'].shift(+re_allocation_day) / stock_dict[stock_ticker]['Adj Close']
 
 
-# opening paths and creating dictionaries and dataframes
-for path in glob.glob('*.csv'): #searches directory for *csv files
-    stock_ticker = path.strip('.csv')  # cleans file path of .csv
-    # stockmarket.append(stock_ticker) # delete
-    stock_dict[stock_ticker] = pd.read_csv(path, usecols=['Date','Close','Adj Close'],index_col='Date') #assigns stock ticker to dictionary key
+#creates DF
+'/n'
+for path in glob.glob('*.csv'):
+
+    stock_ticker = path.strip('.csv')
+
+    stock_dict[stock_ticker] = pd.read_csv(path, usecols=['Date','Close','Adj Close'],index_col='Date')
     stock_dict[stock_ticker].insert(2, 'Close Ratio', stock_dict[stock_ticker]['Close'].shift(+1)/stock_dict[stock_ticker]['Close'])
     stock_dict[stock_ticker].insert(3, 'Adj Close Ratio', stock_dict[stock_ticker]['Adj Close'].shift(+1) / stock_dict[stock_ticker]['Adj Close'])
     stock_dict[stock_ticker].insert(4, stock_ticker + ' Dividend',abs(round((stock_dict[stock_ticker]['Adj Close Ratio'] - stock_dict[stock_ticker]['Close Ratio']), 5)))
-    universe = pd.concat(stock_dict,axis=1)   # concatenated axis for each stock ticker to a single dataframe
+    stock_dict[stock_ticker].insert(5,stock_ticker + ' % change', (stock_dict[stock_ticker]['Adj Close'].shift(rebal_inverval) /stock_dict[stock_ticker]['Adj Close'].shift(0) - 1)*100)
+
+    universe = pd.concat(stock_dict,axis=1)
+
     div_ser = stock_dict[stock_ticker][stock_ticker + ' Dividend'].loc[stock_dict[stock_ticker][stock_ticker + ' Dividend'] > 0]
     div_days_dict[stock_ticker] = div_ser
-# print(universe.to_string())
 
+
+# calculate percent change and choose 5 stocks to reinvest in.
+check_max = universe.filter(regex= '% change').iloc[5].sort_values()
+new_portfolio = universe.filter(regex= '% change').iloc[5].sort_values().keys().get_level_values(0)
+print(check_max[:5])
+print(type(check_max),'\n')
+
+portfolio = list(new_portfolio[:5])
+print(portfolio)
+print(type(portfolio))
+
+# print(universe.filter(regex= '% change').iloc[5].sort_values()) # Want to print an index from multiindex ..MultiIndex.get_level_values
+# need multiindex from series
+
+    # # Pulling Info at each rebalance
+    # i=0
+    # c = len(universe)
+    # while i < 5:
+    #     # print(i)
+    #     # print(stock_dict[stock_ticker][stock_ticker + ' % change'].iloc[i+rebal_inverval])
+    #     check_max.append(stock_dict[stock_ticker][stock_ticker + ' % change'].iloc[i + rebal_inverval])
+    #     print(type(check_max))
+    #     print(check_max)
+    #     i = i + rebal_inverval
+
+# print(universe)
+# print(universe.to_string())
+'/n'
+
+'/n'
+# # Pulling Info at each rebalance
+# i=0
+# c = len(universe)
+# while i < 6:
+#     print(i)
+#     print(universe[stock_ticker + ' % change'].iloc[i])
+#     i = i + rebal_inverval
+'/n'
+
+
+# initial investment - MTM Loop - Do Not delete
+'/n'
 for i in range(0,len(portfolio)):
     ticker = portfolio[i]
+
     close_price = stock_dict[ticker]['Close'].iloc[0]
     stock_shares_dict[ticker + ' Shares'] = float(int(initial_investment/close_price))
     cash_left[ticker] = initial_investment - (stock_shares_dict[ticker + ' Shares'] * close_price)
@@ -56,7 +100,31 @@ for i in range(0,len(portfolio)):
     shares_arr = np.asarray(shares_list)
     close_price_arr = np.asarray(close_price_list)
     MTM = sum(cash_arr) + sum(shares_arr * close_price_arr)
-print(MTM)
+# print(MTM)
+'/n'
+
+
+# initial investment MTM Loop Copy - working on rebalancing
+for i in range(0,len(portfolio)):
+    ticker = portfolio[i]
+
+    close_price = stock_dict[ticker]['Close'].iloc[0]
+    stock_shares_dict[ticker + ' Shares'] = float(int(initial_investment/close_price))
+    cash_left[ticker] = initial_investment - (stock_shares_dict[ticker + ' Shares'] * close_price)
+
+    cash_list.append(cash_left[ticker])
+    shares_list.append(stock_shares_dict[ticker + ' Shares'])
+    close_price_list.append(close_price)
+
+    cash_arr = np.asarray(cash_list)
+    shares_arr = np.asarray(shares_list)
+    close_price_arr = np.asarray(close_price_list)
+    MTM = sum(cash_arr) + sum(shares_arr * close_price_arr)
+# print(MTM)
+'/n'
+
+
+
 
 
 # # Cash
